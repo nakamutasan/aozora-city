@@ -60,9 +60,9 @@
       <nav class="nav" aria-label="メインメニュー">
         <ul>
           <li><a href="#life">くらし・手続き</a></li>
-          <li><a href="#chapter-kosodate">子育て・教育</a></li>
+          <li><a href="#life">子育て・教育</a></li>
           <li><a href="#bousai-info">防災・安全</a></li>
-          <li><a href="#chapter-kanko">観光・イベント</a></li>
+          <li><a href="#events">観光・イベント</a></li>
           <li><a href="#mayor">市長の部屋</a></li>
           <li><a href="#office">市役所案内</a></li>
         </ul>
@@ -76,9 +76,12 @@
 
   <main id="main">
 
-    <!-- オープニング：空の上から、雲を抜けて街へ降りていく -->
-    <section id="top" class="intro" aria-label="あおぞら市へようこそ">
-      <div class="intro-stage">
+    <!-- 全画面の演出（タップ・スワイプで1枚ずつ進む） -->
+    <div class="cinema" aria-label="あおぞら市へようこそ">
+      <p class="cinema-logo">あおぞら市<span>AOZORA CITY</span></p>
+
+      <!-- 1・2枚目：空の上から、雲を抜けて街へ降りていく -->
+      <section id="top" class="slide intro-stage">
         <div class="layer sky"><img src="images/intro-sky.jpg" alt=""></div>
         <div class="layer sun" aria-hidden="true"></div>
         <div class="layer town"><img src="images/intro-town.jpg" alt="青空と山に囲まれた、あおぞら市の町並み"></div>
@@ -99,15 +102,11 @@
           <p class="intro-tag">ひとも、まちも、のびやかに。</p>
         </div>
 
-        <a href="#life" class="skip-intro">スキップして本文へ ↓</a>
-        <p class="scroll-hint" aria-hidden="true">Scroll</p>
-      </div>
-    </section>
+      </section>
 
-    <!-- 章：画面いっぱいの写真で、市の取り組みを紹介 -->
-    <div class="chapters">
-      <section id="chapter-kosodate" class="chapter">
-        <div class="chapter-bg"><img src="images/ch-kosodate.jpg" alt="公園の遊具で遊ぶ親子" loading="lazy"></div>
+      <!-- 3〜6枚目：画面いっぱいの写真で、市の取り組みを紹介 -->
+      <section id="chapter-kosodate" class="slide chapter">
+        <div class="chapter-bg"><img src="images/ch-kosodate.jpg" alt="公園の遊具で遊ぶ親子"></div>
         <div class="chapter-text">
           <p class="chapter-num">01 — Kosodate</p>
           <h2><span class="en">Family</span>子育て・教育</h2>
@@ -116,8 +115,8 @@
         </div>
       </section>
 
-      <section id="chapter-bousai" class="chapter">
-        <div class="chapter-bg"><img src="images/ch-bousai.jpg" alt="川と堤防ぞいの住宅地" loading="lazy"></div>
+      <section id="chapter-bousai" class="slide chapter">
+        <div class="chapter-bg"><img src="images/ch-bousai.jpg" alt="川と堤防ぞいの住宅地"></div>
         <div class="chapter-text">
           <p class="chapter-num">02 — Bousai</p>
           <h2><span class="en">Safety</span>防災・安全</h2>
@@ -126,8 +125,8 @@
         </div>
       </section>
 
-      <section id="chapter-kanko" class="chapter">
-        <div class="chapter-bg"><img src="images/ch-kanko.jpg" alt="霧のかかった山と湖" loading="lazy"></div>
+      <section id="chapter-kanko" class="slide chapter">
+        <div class="chapter-bg"><img src="images/ch-kanko.jpg" alt="霧のかかった山と湖"></div>
         <div class="chapter-text">
           <p class="chapter-num">03 — Kanko</p>
           <h2><span class="en">Nature</span>観光・イベント</h2>
@@ -136,7 +135,7 @@
         </div>
       </section>
 
-      <section id="chapter-mayor" class="chapter chapter-mayor">
+      <section id="chapter-mayor" class="slide chapter chapter-mayor">
         <div class="chapter-bg sky-bg" aria-hidden="true">
           <span class="cloud m1"></span><span class="cloud m2"></span><span class="cloud m3"></span>
         </div>
@@ -147,6 +146,19 @@
           <a href="#mayor" class="chapter-link">市長の部屋へ →</a>
         </div>
       </section>
+
+      <!-- 右側の点（今どの画面か。押すとその画面へ） -->
+      <div class="dots" role="tablist" aria-label="画面の切り替え">
+        <button type="button" aria-label="空の上"></button>
+        <button type="button" aria-label="あおぞら市"></button>
+        <button type="button" aria-label="子育て・教育"></button>
+        <button type="button" aria-label="防災・安全"></button>
+        <button type="button" aria-label="観光・イベント"></button>
+        <button type="button" aria-label="市長の部屋"></button>
+      </div>
+
+      <button type="button" class="skip-intro">スキップ →</button>
+      <p class="cinema-hint" aria-hidden="true">タップ・スワイプで次へ</p>
     </div>
 
     <!-- ここから下は、ふつうの市役所サイトの便利なページ -->
@@ -310,7 +322,7 @@
   </footer>
 
   <!-- 上に戻るボタン -->
-  <a href="#top" class="to-top" aria-label="ページの先頭へ戻る">↑</a>
+  <a href="#main" class="to-top" aria-label="ページの先頭へ戻る">↑</a>
 
   <!-- 見本サイト用のお知らせ -->
   <div class="toast" role="status" aria-live="polite"></div>

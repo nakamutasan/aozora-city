@@ -316,20 +316,125 @@ body.menu-open .menu-toggle span:nth-child(1) { transform: translateY(7px) rotat
 body.menu-open .menu-toggle span:nth-child(2) { opacity: 0; }
 body.menu-open .menu-toggle span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
-/* --- 6. オープニング（空の上から、雲を抜けて街へ） --- */
-.intro {
-  position: relative;
-  height: 320vh; /* この長さの分だけスクロールすると、演出が最後まで進む */
-  padding: 0;
-  background-color: #0f1b2b;
+/* --- 6. 全画面の演出（画面に固定して、スライドのように1枚ずつ進む） --- */
+
+/* 演出を見ている間は、うしろのページがスクロールしないように */
+html.cinema-on,
+html.cinema-on body {
+  overflow: hidden;
+  overscroll-behavior: none; /* スマホで画面全体がびよーんと引っぱられないように */
 }
 
-.intro-stage {
-  position: sticky; /* スクロールしている間、画面に止まって見える */
-  top: var(--hh);
-  height: calc(100vh - var(--hh));
-  height: calc(100svh - var(--hh));
+.cinema {
+  position: fixed;
+  inset: 0;
+  z-index: 60; /* ヘッダーよりも手前に、画面いっぱい */
+  height: 100vh;
+  height: 100dvh; /* スマホのアドレスバーが出ても消えても、ちょうど画面の高さ */
   overflow: hidden;
+  background-color: #0f1b2b;
+  touch-action: none; /* 指の動きは、すべて script.js が受け取る */
+  user-select: none;
+  -webkit-user-select: none;
+  transition: transform 1.2s var(--ease);
+}
+
+/* 最後まで進む（スキップする）と、上へ抜けて、便利なページが出てくる */
+.cinema.is-out {
+  transform: translateY(-100%);
+  pointer-events: none;
+}
+
+.slide {
+  position: absolute;
+  inset: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.cinema img {
+  -webkit-user-drag: none;
+}
+
+/* 左上の小さなロゴ */
+.cinema-logo {
+  position: absolute;
+  top: calc(20px + env(safe-area-inset-top));
+  left: 20px;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.05rem;
+  letter-spacing: 0.1em;
+  line-height: 1.3;
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.3);
+  pointer-events: none;
+}
+
+.cinema-logo span {
+  font-family: var(--en);
+  font-weight: 500;
+  font-size: 0.6rem;
+  letter-spacing: 0.3em;
+}
+
+/* 右側の点（今どの画面か） */
+.dots {
+  position: absolute;
+  right: 18px;
+  top: 50%;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  translate: 0 -50%;
+}
+
+.dots button {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.dots button::before {
+  content: "";
+  display: block;
+  width: 8px;
+  height: 8px;
+  margin: auto;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.55);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.18), 0 1px 6px rgba(0, 0, 0, 0.35); /* 明るい写真の上でも見えるように */
+  transition: background-color 0.4s, transform 0.4s var(--ease);
+}
+
+.dots button[aria-selected="true"]::before {
+  background-color: #fff;
+  transform: scale(1.6);
+}
+
+/* 下の「タップ・スワイプで次へ」 */
+.cinema-hint {
+  position: absolute;
+  left: 50%;
+  bottom: calc(20px + env(safe-area-inset-bottom));
+  z-index: 10;
+  margin: 0;
+  translate: -50% 0;
+  color: #fff;
+  font-size: 0.8rem;
+  letter-spacing: 0.15em;
+  white-space: nowrap;
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.4);
+  animation: hint 2s ease-in-out infinite;
+  transition: opacity 0.6s;
+  pointer-events: none;
 }
 
 .layer {
@@ -347,10 +452,21 @@ body.menu-open .menu-toggle span:nth-child(3) { transform: translateY(-7px) rota
   transform-origin: 50% 45%;
 }
 
-/* 太陽のまぶしい光 */
+/* 動く写真は、スマホでもなめらかに動くよう、あらかじめ準備しておく */
+.sky img,
+.town img,
+.sky,
+.sun,
+.town,
+.fog,
+.intro-copy {
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+}
+
+/* 太陽のまぶしい光（重い「光らせる重ね方」は使わず、ふつうに重ねる） */
 .sun {
-  background: radial-gradient(circle at 50% 38%, rgba(255, 236, 190, 0.85), rgba(255, 200, 120, 0.25) 22%, transparent 55%);
-  mix-blend-mode: screen;
+  background: radial-gradient(circle at 50% 38%, rgba(255, 244, 214, 0.7), rgba(255, 214, 150, 0.18) 22%, transparent 55%);
   pointer-events: none;
 }
 
@@ -377,10 +493,11 @@ body.menu-open .menu-toggle span:nth-child(3) { transform: translateY(-7px) rota
   width: 70vw;
   height: 34vw;
   border-radius: 50%;
-  background: radial-gradient(closest-side, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.6) 55%, rgba(255, 255, 255, 0));
-  filter: blur(6px);
+  /* ぼかし（重い）は使わず、ふちが自然に消えていくグラデーションだけで、ふわっと見せる */
+  background: radial-gradient(closest-side, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.7) 40%, rgba(255, 255, 255, 0.25) 75%, rgba(255, 255, 255, 0));
   opacity: 0;
   will-change: transform, opacity;
+  backface-visibility: hidden;
 }
 
 .c1 { left: -20%; top: 50%; }
@@ -472,55 +589,39 @@ body.menu-open .menu-toggle span:nth-child(3) { transform: translateY(-7px) rota
 
 .skip-intro {
   position: absolute;
+  top: calc(20px + env(safe-area-inset-top));
   right: 20px;
-  bottom: 20px;
-  z-index: 2;
+  z-index: 10;
+  cursor: pointer;
   padding: 10px 18px;
   border: 1px solid rgba(255, 255, 255, 0.7);
   border-radius: 999px;
-  background-color: rgba(0, 0, 0, 0.25);
+  background-color: rgba(0, 0, 0, 0.35); /* すりガラス効果（重い）の代わりに、少し濃いめの半透明 */
   color: #fff;
   font-size: 0.85rem;
   text-decoration: none;
-  backdrop-filter: blur(6px);
 }
 
 .skip-intro:hover {
   background-color: rgba(0, 0, 0, 0.45);
 }
 
-.scroll-hint {
-  position: absolute;
-  left: 50%;
-  bottom: 18px;
-  margin: 0;
-  translate: -50% 0;
-  font-family: var(--en);
-  font-size: 0.75rem;
-  letter-spacing: 0.3em;
-  color: #fff;
-  animation: hint 2s ease-in-out infinite;
-}
-
-/* 上下にゆれる（透明度はスクロールで変えるので、ここでは動かさない） */
+/* 上下にゆれる（透明度は script.js で変えるので、ここでは動かさない） */
 @keyframes hint {
   0%, 100% { transform: translateY(0); }
   50%      { transform: translateY(6px); }
 }
 
-/* --- 7. 章（画面いっぱいの写真が、重なりながら切り替わる） --- */
-.chapters {
-  position: relative;
+/* --- 7. 章（画面いっぱいの写真が、下から上にかぶさるように切り替わる） --- */
+.chapter {
+  color: #fff;
+  transform: translate3d(0, 100%, 0); /* 最初は画面の下に隠れている（script.js が動かす） */
+  will-change: transform;
+  backface-visibility: hidden;
 }
 
-.chapter {
-  position: sticky; /* 次の章が、上にかぶさるように出てくる */
-  top: var(--hh);
-  height: calc(100vh - var(--hh));
-  height: calc(100svh - var(--hh));
-  padding: 0;
-  overflow: hidden;
-  color: #fff;
+.chapter-bg img {
+  will-change: transform;
 }
 
 .chapter-bg {
@@ -553,7 +654,7 @@ body.menu-open .menu-toggle span:nth-child(3) { transform: translateY(-7px) rota
   position: absolute;
   left: max(20px, calc((100% - 1120px) / 2));
   right: 20px;
-  bottom: 56px;
+  bottom: calc(72px + env(safe-area-inset-bottom));
   max-width: 620px;
 }
 
@@ -626,7 +727,6 @@ body.menu-open .menu-toggle span:nth-child(3) { transform: translateY(-7px) rota
 
 .sky-bg .cloud {
   opacity: 0.9;
-  filter: blur(4px);
 }
 
 .m1 { left: -10%; top: 15%; animation: drift 40s linear infinite; }
@@ -1337,17 +1437,16 @@ body.contrast .footer {
   }
 
   .chapter-text {
-    bottom: 40px;
+    right: 52px; /* 右の点とかさならないように */
+    bottom: calc(64px + env(safe-area-inset-bottom));
   }
 
   .chapter-text p {
     font-size: 0.95rem;
   }
 
-  .skip-intro {
-    right: 50%;
-    translate: 50% 0;
-    bottom: 56px;
+  .dots {
+    right: 6px;
   }
 
   .office-info {
@@ -1375,34 +1474,7 @@ body.contrast .footer {
     scroll-behavior: auto;
   }
 
-  /* オープニングの演出はせず、街の写真とタイトルだけを表示 */
-  .intro {
-    height: auto;
-  }
-
-  .intro-stage {
-    position: relative;
-    top: 0;
-    height: 70vh;
-  }
-
-  .town,
-  .title {
-    opacity: 1 !important;
-  }
-
-  .first,
-  .clouds,
-  .fog,
-  .scroll-hint {
-    display: none;
-  }
-
-  .chapter {
-    position: relative;
-    top: 0;
-  }
-
+  /* 演出の画面は、動かさずにパッと切り替わる（script.js 側で調整） */
   .chapter-text > *,
   .reveal {
     opacity: 1 !important;

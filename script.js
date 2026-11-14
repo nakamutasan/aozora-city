@@ -14,8 +14,27 @@ function ease(t) {
   return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 }
 
-// --- 1. オープニング：空の上から、雲を抜けて街へ降りていく ---
-const intro = document.querySelector('.intro');
+// 速さがほぼ一定の、おだやかな動き方（雲を抜けるところ用）
+function easeSine(t) {
+  return -(Math.cos(Math.PI * t) - 1) / 2;
+}
+
+// =========================================
+// 全画面の演出（スライドのように1枚ずつ進む）
+//  0：雲の上 → 1：雲を抜けて「AOZORA」 → 2〜5：4つの章
+// =========================================
+const cinema = document.querySelector('.cinema');
+const chapters = [...document.querySelectorAll('.chapter')];
+const dots = [...document.querySelectorAll('.dots button')];
+const hint = document.querySelector('.cinema-hint');
+const LAST = 1 + chapters.length; // 最後の画面の番号（5）
+
+let pos = 0;            // 今どこにいるか（0〜5。途中は小数）
+let gliding = false;    // 動いている途中か
+let lockUntil = 0;      // 止まった直後の、余分なスワイプを無視する時間
+let cinemaOn = true;    // 演出を見ているか（false＝便利なページを見ている）
+
+// --- 1. 雲を抜けて街へ降りていく（p：0〜1） ---
 const skyImg = document.querySelector('.sky img');
 const sky = document.querySelector('.sky');
 const sun = document.querySelector('.sun');
@@ -25,8 +44,6 @@ const fog = document.querySelector('.fog');
 const firstCopy = document.querySelector('.intro-copy.first');
 const title = document.querySelector('.intro-copy.title');
 const titleEn = document.querySelector('.h1-en');
-const hint = document.querySelector('.scroll-hint');
-const skipBtn = document.querySelector('.skip-intro');
 
 // 雲ごとに、通り抜けるときに流れていく方向（横, 縦）
 const clouds = [...document.querySelectorAll('.clouds .cloud')].map((el, i) => ({
@@ -34,20 +51,19 @@ const clouds = [...document.querySelectorAll('.clouds .cloud')].map((el, i) => (
   dir: [[-1, 0.3], [1, 0.2], [-0.4, 1], [0.6, -0.6], [-0.8, -0.7], [0.5, 1]][i],
 }));
 
-function updateIntro() {
-  const rect = intro.getBoundingClientRect();
-  const stageH = document.querySelector('.intro-stage').offsetHeight;
-  // p：オープニングをどこまで進んだか（0＝始まり、1＝終わり）
-  const p = range(-rect.top, 0, rect.height - stageH);
+let lastP = -1; // 前回の p（同じなら描き直さない）
 
-  // 最初の文字：スクロールし始めると、上へ消えていく
+function updateIntro(p) {
+  if (p === lastP) return; // 変わっていなければ何もしない（スマホの負担を減らす）
+  lastP = p;
+
+  // 最初の文字：進み始めると、上へ消えていく
   const out = range(p, 0.04, 0.2);
   firstCopy.style.opacity = 1 - out;
-  firstCopy.style.transform = `translateY(${-out * 60}px)`;
-  hint.style.opacity = 1 - range(p, 0, 0.08);
+  firstCopy.style.transform = `translate3d(0, ${-out * 60}px, 0)`;
 
   // 空の写真：雲に向かって近づいていく（大きくなる）
-  skyImg.style.transform = `scale(${1 + ease(range(p, 0, 0.6)) * 1.4})`;
+  skyImg.style.transform = `scale3d(${1 + ease(range(p, 0, 0.6)) * 1.4}, ${1 + ease(range(p, 0, 0.6)) * 1.4}, 1)`;
   sky.style.opacity = 1 - range(p, 0.5, 0.62);
   sun.style.opacity = 1 - range(p, 0.25, 0.5);
 
@@ -58,7 +74,7 @@ function updateIntro() {
   clouds.forEach(({ el, dir }) => {
     el.style.opacity = Math.min(cIn, cOut);
     el.style.transform =
-      `translate(${dir[0] * cGo * 55}vw, ${dir[1] * cGo * 35}vh) scale(${1 + cGo * 3})`;
+      `translate3d(${dir[0] * cGo * 55}vw, ${dir[1] * cGo * 35}vh, 0) scale(${1 + cGo * 3})`;
   });
 
   // 雲の中：一瞬、真っ白なもやに包まれる
@@ -66,60 +82,198 @@ function updateIntro() {
 
   // 街：もやが晴れると見えてきて、少しずつ引いていく
   town.style.opacity = range(p, 0.55, 0.7);
-  townImg.style.transform = `scale(${1.35 - ease(range(p, 0.55, 1)) * 0.35})`;
+  const z = 1.35 - ease(range(p, 0.55, 1)) * 0.35;
+  townImg.style.transform = `scale3d(${z}, ${z}, 1)`;
 
-  // 「AOZORA」の文字：ぼやけて広がった状態から、くっきり集まる
+  // 「AOZORA」の文字：少し大きい状態から、すっと浮かび上がって定位置へ
+  // （ぼかしや文字の間隔を毎回変えるのは、スマホには重いので使わない）
   const t = ease(range(p, 0.7, 0.88));
   title.style.opacity = t;
-  title.style.transform = `translateY(${(1 - t) * 30}px)`;
-  titleEn.style.letterSpacing = `${0.3 - t * 0.24}em`;
-  titleEn.style.filter = `blur(${(1 - t) * 10}px) drop-shadow(0 8px 40px rgba(0, 40, 90, 0.35))`;
-
-  skipBtn.style.opacity = 1 - range(p, 0.9, 1);
+  title.style.transform = `translate3d(0, ${(1 - t) * 30}px, 0) scale(${1.12 - t * 0.12})`;
 }
 
-// --- 2. 章：画面に入ってくるとき、写真が少しずつ引いていく ---
-const chapters = document.querySelectorAll('.chapter');
+// --- 2. 今の位置（pos）に合わせて、画面全体を描く ---
+function render() {
+  updateIntro(Math.min(Math.max(pos, 0), 1));
 
-function updateChapters() {
-  const vh = window.innerHeight;
-  chapters.forEach((ch) => {
-    const top = ch.getBoundingClientRect().top;
-    const z = 1 + 0.15 * range(top, 0, vh); // 下から入ってくるほど大きい → 止まると 1 に
-    ch.style.setProperty('--zoom', z.toFixed(4));
+  // 章 k は、pos が k+1 → k+2 の間に、下から上へかぶさってくる
+  chapters.forEach((ch, k) => {
+    const t = Math.min(Math.max(pos - (k + 1), 0), 1);
+    if (ch._t === t) return; // 変わっていない章は描き直さない
+    ch._t = t;
+    ch.style.transform = `translate3d(0, ${(1 - t) * 100}%, 0)`;
+    ch.style.setProperty('--zoom', (1 + 0.15 * (1 - t)).toFixed(4)); // 入ってくるとき、写真が少し引いていく
+    ch.classList.toggle('is-in', t > 0.6);
   });
+
+  // 右の点：今いる画面に印をつける
+  const now = Math.round(pos);
+  dots.forEach((d, i) => d.setAttribute('aria-selected', i === now));
+
+  // 「タップ・スワイプで次へ」は、最後の画面では消す
+  hint.style.opacity = pos > LAST - 0.5 ? 0 : 1;
 }
 
-// 章の半分以上が見えたら、文字を出す
-const chapterObserver = new IntersectionObserver((entries) => {
-  entries.forEach((e) => {
-    if (e.isIntersecting) e.target.classList.add('is-in');
-  });
-}, { threshold: 0.45 });
-chapters.forEach((ch) => chapterObserver.observe(ch));
+// --- 3. 指定した画面まで、ゆっくり進む ---
+function glideTo(target) {
+  target = Math.min(Math.max(target, 0), LAST);
+  const start = pos;
+  const distance = target - start;
+  if (distance === 0) return;
 
-// --- 3. スクロールしたときにまとめて更新（なめらかにするため、1フレームに1回だけ） ---
-const toTop = document.querySelector('.to-top');
-let ticking = false;
+  // 雲を抜ける部分（0↔1）は特にゆっくり。章は1枚あたり1.5秒
+  const throughClouds = Math.min(start, target) < 1;
+  const duration = reduceMotion ? 0 : throughClouds ? 5000 : 1500 * Math.min(Math.abs(distance), 2);
+  const curve = throughClouds ? easeSine : ease;
+  const t0 = performance.now();
+  gliding = true;
 
-function onScroll() {
-  if (ticking) return;
-  ticking = true;
-  requestAnimationFrame(() => {
-    if (!reduceMotion) {
-      updateIntro();
-      updateChapters();
+  function step(now) {
+    const t = duration === 0 ? 1 : Math.min((now - t0) / duration, 1);
+    pos = start + distance * curve(t);
+    render();
+    if (t < 1) {
+      requestAnimationFrame(step);
+    } else {
+      gliding = false;
+      lockUntil = performance.now() + 700;
     }
-    toTop.classList.toggle('is-show', window.scrollY > window.innerHeight);
-    ticking = false;
-  });
+  }
+  requestAnimationFrame(step);
 }
 
-window.addEventListener('scroll', onScroll, { passive: true });
-window.addEventListener('resize', onScroll);
-onScroll();
+// --- 4. 演出を終えて、便利なページを見る ／ 演出に戻る ---
+function exitCinema(scrollTargetId) {
+  cinemaOn = false;
+  cinema.classList.add('is-out');
+  document.documentElement.classList.remove('cinema-on');
+  lockUntil = performance.now() + 1200;
+  window.scrollTo({ top: 0, behavior: 'instant' });
 
-// --- 4. 文字の大きさ・背景色の切り替え（次に来たときも覚えておく） ---
+  // 「子育ての手続きを見る」などを押したときは、その場所までスクロール
+  if (scrollTargetId) {
+    setTimeout(() => {
+      document.getElementById(scrollTargetId)?.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth' });
+    }, reduceMotion ? 0 : 700);
+  }
+}
+
+function enterCinema(toPos) {
+  window.scrollTo({ top: 0, behavior: 'instant' });
+  cinemaOn = true;
+  cinema.classList.remove('is-out');
+  document.documentElement.classList.add('cinema-on');
+  lockUntil = performance.now() + 1200;
+  if (toPos !== undefined) {
+    pos = toPos;
+    render();
+  }
+}
+
+// --- 5. 次へ（dir=1）・前へ（dir=-1） ---
+function go(dir) {
+  if (gliding || performance.now() < lockUntil) return;
+
+  if (cinemaOn) {
+    if (dir > 0) {
+      if (pos >= LAST - 0.01) exitCinema();       // 最後の画面の次は、便利なページへ
+      else glideTo(Math.round(pos) + 1);
+    } else if (pos > 0.01) {
+      glideTo(Math.round(pos) - 1);
+    }
+  } else if (dir < 0 && window.scrollY <= 0) {
+    enterCinema(); // 便利なページの一番上で、さらに上に戻すと演出に戻る
+  }
+}
+
+// --- 6. 操作の受け取り ---
+document.documentElement.classList.add('cinema-on');
+render();
+
+// マウスのホイール・トラックパッド
+window.addEventListener('wheel', (e) => {
+  if (Math.abs(e.deltaY) < 4) return;
+  const dir = e.deltaY > 0 ? 1 : -1;
+  if (cinemaOn || (dir < 0 && window.scrollY <= 0)) {
+    e.preventDefault();
+    go(dir);
+  }
+}, { passive: false });
+
+// スマホのスワイプ
+let touchY = null;
+window.addEventListener('touchstart', (e) => { touchY = e.touches[0].clientY; }, { passive: true });
+
+window.addEventListener('touchmove', (e) => {
+  if (cinemaOn) e.preventDefault(); // 演出中は、画面がぐらぐら動かないように
+}, { passive: false });
+
+window.addEventListener('touchend', (e) => {
+  if (touchY === null) return;
+  const dy = touchY - e.changedTouches[0].clientY;
+  touchY = null;
+  if (Math.abs(dy) < 30) return; // 軽くさわっただけ（タップ）は、下の click で処理する
+  const dir = dy > 0 ? 1 : -1;
+  if (cinemaOn || (dir < 0 && window.scrollY <= 0)) go(dir);
+});
+
+// タップ（クリック）：ボタンやリンク以外の場所なら、次の画面へ
+cinema.addEventListener('click', (e) => {
+  if (e.target.closest('a, button')) return;
+  go(1);
+});
+
+// 章の中のリンク（「子育ての手続きを見る」など）：演出を終えて、その場所へ
+cinema.querySelectorAll('.chapter-link').forEach((a) => {
+  a.addEventListener('click', (e) => {
+    e.preventDefault();
+    exitCinema(a.getAttribute('href').slice(1));
+  });
+});
+
+// スキップボタン
+document.querySelector('.skip-intro').addEventListener('click', () => exitCinema());
+
+// 右の点：押した画面へ
+dots.forEach((d, i) => d.addEventListener('click', () => {
+  if (!gliding) glideTo(i);
+}));
+
+// キーボード（↓・PageDown・スペース・Enter で次へ、↑・PageUp で前へ、Esc でスキップ）
+window.addEventListener('keydown', (e) => {
+  if (!cinemaOn) return;
+  if (e.target.closest('input, textarea')) return;
+  if (['ArrowDown', 'PageDown', ' '].includes(e.key)) { e.preventDefault(); go(1); }
+  if (['ArrowUp', 'PageUp'].includes(e.key)) { e.preventDefault(); go(-1); }
+  if (e.key === 'Escape') exitCinema();
+});
+
+// ヘッダーのロゴ「あおぞら市」：演出の最初に戻る
+document.querySelector('.header .logo').addEventListener('click', (e) => {
+  e.preventDefault();
+  enterCinema(0);
+});
+
+// 画面の大きさが変わったら、描き直す
+window.addEventListener('resize', render);
+
+// =========================================
+// ここから下は、便利なページ部分
+// =========================================
+
+// --- 7. 上に戻るボタン ---
+const toTop = document.querySelector('.to-top');
+
+window.addEventListener('scroll', () => {
+  toTop.classList.toggle('is-show', window.scrollY > window.innerHeight * 0.6);
+}, { passive: true });
+
+toTop.addEventListener('click', (e) => {
+  e.preventDefault();
+  window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+});
+
+// --- 8. 文字の大きさ・背景色の切り替え（次に来たときも覚えておく） ---
 function save(key, value) {
   try { localStorage.setItem(key, value); } catch (e) { /* 保存できなくても動くように */ }
 }
@@ -145,7 +299,7 @@ document.querySelectorAll('[data-theme]').forEach((b) => b.addEventListener('cli
 setSize(load('aozora-size') || 'normal');
 setTheme(load('aozora-theme') || 'normal');
 
-// --- 5. スマホ用メニュー ---
+// --- 9. スマホ用メニュー ---
 const toggle = document.querySelector('.menu-toggle');
 
 toggle.addEventListener('click', () => {
@@ -159,7 +313,7 @@ document.querySelectorAll('.nav a').forEach((a) => a.addEventListener('click', (
   toggle.setAttribute('aria-expanded', false);
 }));
 
-// --- 6. お知らせのタブ（すべて・くらし・子育て・防災） ---
+// --- 10. お知らせのタブ（すべて・くらし・子育て・防災） ---
 const tabs = document.querySelectorAll('.tabs button');
 
 tabs.forEach((tab) => {
@@ -172,7 +326,7 @@ tabs.forEach((tab) => {
   });
 });
 
-// --- 7. スクロールしたら、カードなどをふわっと表示 ---
+// --- 11. スクロールしたら、カードなどをふわっと表示 ---
 const revealObserver = new IntersectionObserver((entries) => {
   entries.forEach((e) => {
     if (e.isIntersecting) {
@@ -189,7 +343,7 @@ document.querySelectorAll('.section-title, .life-grid li, .field-grid li, .bousa
   revealObserver.observe(el);
 });
 
-// --- 8. 見本サイト用：リンクや検索を押したときのお知らせ ---
+// --- 12. 見本サイト用：リンクや検索を押したときのお知らせ ---
 const toast = document.querySelector('.toast');
 let toastTimer;
 
@@ -209,115 +363,3 @@ document.querySelector('[data-demo-form]').addEventListener('submit', (e) => {
   e.preventDefault();
   showToast();
 });
-
-// --- 9. 1回スワイプするだけで、次の画面までゆっくり自動で進む ---
-// オープニングと4つの章の部分だけ。その下の「便利なページ」は、ふつうにスクロールできる
-const header = document.querySelector('.header');
-let snapping = false;   // 自動で進んでいる途中か
-let lockUntil = 0;      // 止まった直後の、余分なスワイプを無視する時間
-
-// 止まる場所（画面の区切り）の一覧
-function getStops() {
-  const hh = header.offsetHeight;
-  const stageH = document.querySelector('.intro-stage').offsetHeight;
-  const chaptersTop = document.querySelector('.chapters').offsetTop;
-  const stops = [
-    0,                                                      // ページの一番上（雲の上）
-    intro.offsetTop + intro.offsetHeight - stageH,          // 雲を抜けて「AOZORA」
-  ];
-  // 4つの章（章は画面に止まる作りなので、位置は「前の章の高さの合計」で計算する）
-  let sum = 0;
-  chapters.forEach((ch) => {
-    stops.push(chaptersTop + sum - hh);
-    sum += ch.offsetHeight;
-  });
-  stops.push(document.querySelector('.search-area').offsetTop - hh);     // 便利なページの始まり
-  return stops;
-}
-
-// 自動で進む場所かどうか（便利なページより上にいるとき）
-function inSnapZone(direction) {
-  const stops = getStops();
-  const last = stops[stops.length - 1];
-  const y = window.scrollY;
-  if (document.body.classList.contains('menu-open')) return false;
-  return direction > 0 ? y < last - 2 : y <= last + 2 && y > 2;
-}
-
-// 指定した場所まで、ゆっくりスクロールする
-function glideTo(target) {
-  const start = window.scrollY;
-  const distance = target - start;
-  // オープニング（雲を抜ける部分）は特にゆっくり、章はふつうの速さ
-  const isIntro = Math.abs(distance) > window.innerHeight * 1.5;
-  const duration = isIntro ? 5000 : 1500;
-  // オープニングは、速さがずっと一定に近い、おだやかな動き方にする
-  const curve = isIntro ? (t) => -(Math.cos(Math.PI * t) - 1) / 2 : ease;
-  const t0 = performance.now();
-  snapping = true;
-
-  function step(now) {
-    const t = Math.min((now - t0) / duration, 1);
-    window.scrollTo({ top: start + distance * curve(t), behavior: 'instant' });
-    if (t < 1) {
-      requestAnimationFrame(step);
-    } else {
-      snapping = false;
-      lockUntil = performance.now() + 800;
-    }
-  }
-  requestAnimationFrame(step);
-}
-
-// 次（direction=1）または前（-1）の画面へ
-function snap(direction) {
-  if (snapping || performance.now() < lockUntil) return;
-  const stops = getStops();
-  const y = window.scrollY;
-  const target = direction > 0
-    ? stops.find((s) => s > y + 5)
-    : [...stops].reverse().find((s) => s < y - 5);
-  if (target !== undefined) glideTo(target);
-}
-
-if (!reduceMotion) {
-  // マウスのホイール・トラックパッド
-  window.addEventListener('wheel', (e) => {
-    if (Math.abs(e.deltaY) < 4) return;
-    const dir = e.deltaY > 0 ? 1 : -1;
-    if (!inSnapZone(dir) && !snapping) return;
-    e.preventDefault(); // ふつうのスクロールを止めて、自動で進む
-    snap(dir);
-  }, { passive: false });
-
-  // スマホのスワイプ
-  let touchY = null;
-  window.addEventListener('touchstart', (e) => { touchY = e.touches[0].clientY; }, { passive: true });
-
-  window.addEventListener('touchmove', (e) => {
-    if (touchY === null) return;
-    const dir = touchY - e.touches[0].clientY > 0 ? 1 : -1;
-    if (inSnapZone(dir) || snapping) e.preventDefault();
-  }, { passive: false });
-
-  window.addEventListener('touchend', (e) => {
-    if (touchY === null) return;
-    const dy = touchY - e.changedTouches[0].clientY;
-    touchY = null;
-    if (Math.abs(dy) < 30) return; // 軽くさわっただけのときは何もしない
-    const dir = dy > 0 ? 1 : -1;
-    if (inSnapZone(dir)) snap(dir);
-  });
-
-  // キーボード（↓・PageDown・スペースで次へ、↑・PageUp で前へ）
-  window.addEventListener('keydown', (e) => {
-    if (e.target.closest('input, textarea')) return;
-    const down = ['ArrowDown', 'PageDown', ' '].includes(e.key);
-    const up = ['ArrowUp', 'PageUp'].includes(e.key);
-    if (!down && !up) return;
-    const dir = down ? 1 : -1;
-    if (!inSnapZone(dir) && !snapping) return;
-    e.preventDefault();
-    snap(dir);
-  });
-}
