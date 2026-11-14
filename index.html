@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>あおぞら市公式ホームページ</title>
+  <meta name="description" content="あおぞら市（ポートフォリオ用の架空の市です）の公式ホームページ。くらし・子育て・防災・観光などの情報をお届けします。">
+  <!-- 文字のデザイン（Google Fonts） -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- 読み上げソフトやキーボードで使う人のための「本文へ移動」 -->
+  <a href="#main" class="skip-link">本文へ移動</a>
+
+  <!-- 一番上の便利バー：文字の大きさ・背景色・言語 -->
+  <div class="utility">
+    <div class="container utility-inner">
+      <p class="utility-label">ポートフォリオ用の架空の市のサイトです</p>
+      <div class="utility-tools">
+        <div class="tool" role="group" aria-label="文字の大きさ">
+          <span>文字サイズ</span>
+          <button type="button" data-size="normal" aria-pressed="true">標準</button>
+          <button type="button" data-size="large" aria-pressed="false">大</button>
+        </div>
+        <div class="tool" role="group" aria-label="背景色">
+          <span>背景色</span>
+          <button type="button" data-theme="normal" aria-pressed="true">白</button>
+          <button type="button" data-theme="contrast" aria-pressed="false" class="btn-contrast">黒</button>
+        </div>
+        <button type="button" class="lang" data-demo>English</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 緊急情報の帯 -->
+  <div class="alert" role="region" aria-label="緊急情報">
+    <div class="container alert-inner">
+      <span class="alert-tag">緊急情報</span>
+      <p>現在、発表されている緊急情報はありません。</p>
+      <a href="#bousai-info">防災情報を見る</a>
+    </div>
+  </div>
+
+  <!-- ヘッダー -->
+  <header class="header">
+    <div class="container header-inner">
+      <a href="#top" class="logo">
+        <!-- 市のマーク（青空と雲をイメージしたオリジナル） -->
+        <svg class="emblem" viewBox="0 0 48 48" aria-hidden="true">
+          <circle cx="24" cy="24" r="22" fill="#1f6fc5"/>
+          <circle cx="31" cy="17" r="5" fill="#ffd66b"/>
+          <path d="M11 32a6 6 0 0 1 5.5-6 7.5 7.5 0 0 1 14.5 1.5A5 5 0 0 1 36 32z" fill="#fff"/>
+        </svg>
+        <span class="logo-text"><span class="logo-ja">あおぞら市</span><span class="logo-en">AOZORA CITY</span></span>
+      </a>
+      <nav class="nav" aria-label="メインメニュー">
+        <ul>
+          <li><a href="#life">くらし・手続き</a></li>
+          <li><a href="#chapter-kosodate">子育て・教育</a></li>
+          <li><a href="#bousai-info">防災・安全</a></li>
+          <li><a href="#chapter-kanko">観光・イベント</a></li>
+          <li><a href="#mayor">市長の部屋</a></li>
+          <li><a href="#office">市役所案内</a></li>
+        </ul>
+      </nav>
+      <button type="button" class="menu-toggle" aria-label="メニューを開く" aria-expanded="false">
+        <span></span><span></span><span></span>
+        <small>メニュー</small>
+      </button>
+    </div>
+  </header>
+
+  <main id="main">
+
+    <!-- オープニング：空の上から、雲を抜けて街へ降りていく -->
+    <section id="top" class="intro" aria-label="あおぞら市へようこそ">
+      <div class="intro-stage">
+        <div class="layer sky"><img src="images/intro-sky.jpg" alt=""></div>
+        <div class="layer sun" aria-hidden="true"></div>
+        <div class="layer town"><img src="images/intro-town.jpg" alt="青空と山に囲まれた、あおぞら市の町並み"></div>
+        <!-- CSS で作った雲（スクロールすると近づいて、通り抜ける） -->
+        <div class="clouds" aria-hidden="true">
+          <span class="cloud c1"></span><span class="cloud c2"></span><span class="cloud c3"></span>
+          <span class="cloud c4"></span><span class="cloud c5"></span><span class="cloud c6"></span>
+        </div>
+        <div class="fog" aria-hidden="true"></div>
+
+        <div class="intro-copy first">
+          <p class="eyebrow">AOZORA CITY</p>
+          <p class="intro-lead"><span>空に、</span><span>いちばん近いまち。</span></p>
+        </div>
+
+        <div class="intro-copy title">
+          <h1><span class="h1-en">AOZORA</span><span class="h1-ja">あおぞら市</span></h1>
+          <p class="intro-tag">ひとも、まちも、のびやかに。</p>
+        </div>
+
+        <a href="#life" class="skip-intro">スキップして本文へ ↓</a>
+        <p class="scroll-hint" aria-hidden="true">Scroll</p>
+      </div>
+    </section>
+
+    <!-- 章：画面いっぱいの写真で、市の取り組みを紹介 -->
+    <div class="chapters">
+      <section id="chapter-kosodate" class="chapter">
+        <div class="chapter-bg"><img src="images/ch-kosodate.jpg" alt="公園の遊具で遊ぶ親子" loading="lazy"></div>
+        <div class="chapter-text">
+          <p class="chapter-num">01 — Kosodate</p>
+          <h2><span class="en">Family</span>子育て・教育</h2>
+          <p>公園と緑の多いまちで、子どもたちがのびのび育つように。出産から入学まで、切れ目なく応援します。</p>
+          <a href="#life" class="chapter-link">子育ての手続きを見る →</a>
+        </div>
+      </section>
+
+      <section id="chapter-bousai" class="chapter">
+        <div class="chapter-bg"><img src="images/ch-bousai.jpg" alt="川と堤防ぞいの住宅地" loading="lazy"></div>
+        <div class="chapter-text">
+          <p class="chapter-num">02 — Bousai</p>
+          <h2><span class="en">Safety</span>防災・安全</h2>
+          <p>川とともにくらすまちだからこそ、日ごろの備えを大切に。避難所や防災メールの情報をまとめています。</p>
+          <a href="#bousai-info" class="chapter-link">防災情報を見る →</a>
+        </div>
+      </section>
+
+      <section id="chapter-kanko" class="chapter">
+        <div class="chapter-bg"><img src="images/ch-kanko.jpg" alt="霧のかかった山と湖" loading="lazy"></div>
+        <div class="chapter-text">
+          <p class="chapter-num">03 — Kanko</p>
+          <h2><span class="en">Nature</span>観光・イベント</h2>
+          <p>霧の湖、山並み、季節のおまつり。あおぞら市には、空と自然を感じる景色があります。</p>
+          <a href="#events" class="chapter-link">イベントを見る →</a>
+        </div>
+      </section>
+
+      <section id="chapter-mayor" class="chapter chapter-mayor">
+        <div class="chapter-bg sky-bg" aria-hidden="true">
+          <span class="cloud m1"></span><span class="cloud m2"></span><span class="cloud m3"></span>
+        </div>
+        <div class="chapter-text">
+          <p class="chapter-num">04 — Mayor</p>
+          <h2><span class="en">Mayor</span>市長の部屋</h2>
+          <p>「空に近いまちだからこそ、遠くまで見わたせる市政を。」<br>あおぞら市長　牟田 聖</p>
+          <a href="#mayor" class="chapter-link">市長の部屋へ →</a>
+        </div>
+      </section>
+    </div>
+
+    <!-- ここから下は、ふつうの市役所サイトの便利なページ -->
+
+    <!-- サイト内検索 -->
+    <section class="search-area">
+      <div class="container">
+        <form class="search" role="search" data-demo-form>
+          <label for="site-search" class="visually-hidden">サイト内検索</label>
+          <input id="site-search" type="search" placeholder="キーワードで探す（例：ごみの出し方、住民票）">
+          <button type="submit">検索</button>
+        </form>
+        <ul class="keywords" aria-label="よく検索されるキーワード">
+          <li><a href="#" data-demo>住民票</a></li>
+          <li><a href="#" data-demo>ごみの出し方</a></li>
+          <li><a href="#" data-demo>児童手当</a></li>
+          <li><a href="#" data-demo>マイナンバーカード</a></li>
+          <li><a href="#" data-demo>避難所</a></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 目的から探す -->
+    <section id="life" class="life">
+      <div class="container">
+        <h2 class="section-title"><span class="en">Life Events</span>目的から探す</h2>
+        <ul class="life-grid">
+          <li><a href="#" data-demo><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"/></svg>妊娠・出産</a></li>
+          <li><a href="#" data-demo><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="6" r="2.5"/><circle cx="16" cy="9" r="2"/><path d="M4 20v-5a4 4 0 0 1 8 0v5M13 20v-4a3 3 0 0 1 6 0v4"/></svg>子育て</a></li>
+          <li><a href="#" data-demo><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h7a2 2 0 0 1 2 2v13a2 2 0 0 0-2-2H3zM21 5h-7a2 2 0 0 0-2 2v13a2 2 0 0 1 2-2h7z"/></svg>入学・教育</a></li>
+          <li><a href="#" data-demo><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 7h11v9H2zM13 10h4l3 3v3h-7z"/><circle cx="6" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg>引っ越し・住まい</a></li>
+          <li><a href="#" data-demo><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="13" r="5"/><circle cx="15" cy="13" r="5"/></svg>結婚・離婚</a></li>
+          <li><a href="#" data-demo><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5h6v2M3 12h18"/></svg>就職・退職</a></li>
+          <li><a href="#" data-demo><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="5" r="2"/><path d="M11 8v6l-3 6M11 14l3 6M11 10l4 2v8"/></svg>高齢・介護</a></li>
+          <li><a href="#" data-demo><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3"/><path d="M12 11v10M12 16c-3 0-5-2-5-4M12 18c3 0 5-2 5-4"/></svg>おくやみ</a></li>
+        </ul>
+
+        <h3 class="sub-title">分野から探す</h3>
+        <ul class="field-grid">
+          <li><a href="#" data-demo><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4l5 7 5-7M12 11v9M8 13h8M8 16h8"/></svg>税金</a></li>
+          <li><a href="#" data-demo><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg>ごみ・リサイクル</a></li>
+          <li><a href="#" data-demo><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6v6h6v6h-6v6H9v-6H3V9h6z"/></svg>健康・医療</a></li>
+          <li><a href="#bousai-info"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/></svg>防災・安全</a></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- お知らせ -->
+    <section id="news" class="news">
+      <div class="container">
+        <h2 class="section-title"><span class="en">News</span>お知らせ</h2>
+        <div class="tabs" role="tablist" aria-label="お知らせの種類">
+          <button type="button" role="tab" aria-selected="true" data-filter="all">すべて</button>
+          <button type="button" role="tab" aria-selected="false" data-filter="kurashi">くらし</button>
+          <button type="button" role="tab" aria-selected="false" data-filter="kosodate">子育て</button>
+          <button type="button" role="tab" aria-selected="false" data-filter="bousai">防災</button>
+        </div>
+        <ul class="news-list">
+          <li data-cat="kurashi"><time datetime="2026-11-14">2026年11月14日</time><span class="cat kurashi">くらし</span><a href="#" data-demo>年末年始の市役所の開庁日とごみの収集日について</a></li>
+          <li data-cat="kosodate"><time datetime="2026-11-12">2026年11月12日</time><span class="cat kosodate">子育て</span><a href="#" data-demo>令和9年度 保育所等の入所申込みの受付を始めました</a></li>
+          <li data-cat="bousai"><time datetime="2026-11-10">2026年11月10日</time><span class="cat bousai">防災</span><a href="#" data-demo>あおぞら市 総合防災訓練を実施します（12月7日）</a></li>
+          <li data-cat="kurashi"><time datetime="2026-11-05">2026年11月5日</time><span class="cat kurashi">くらし</span><a href="#" data-demo>マイナンバーカードの休日窓口を開設します</a></li>
+          <li data-cat="kosodate"><time datetime="2026-11-01">2026年11月1日</time><span class="cat kosodate">子育て</span><a href="#" data-demo>子ども医療費の助成を高校生まで広げます</a></li>
+          <li data-cat="bousai"><time datetime="2026-10-28">2026年10月28日</time><span class="cat bousai">防災</span><a href="#" data-demo>防災メールの登録方法が新しくなりました</a></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 防災情報 -->
+    <section id="bousai-info" class="bousai">
+      <div class="container">
+        <h2 class="section-title"><span class="en">Disaster Prevention</span>防災情報</h2>
+        <div class="bousai-grid">
+          <a href="#" class="bousai-card" data-demo><strong>避難所マップ</strong><span>近くの避難所を地図で確認できます</span></a>
+          <a href="#" class="bousai-card" data-demo><strong>ハザードマップ</strong><span>洪水・土砂災害の危険がある場所</span></a>
+          <a href="#" class="bousai-card" data-demo><strong>あおぞら防災メール</strong><span>避難情報をメールでお届けします</span></a>
+          <a href="#" class="bousai-card" data-demo><strong>備えのチェックリスト</strong><span>家庭でできる備えをまとめました</span></a>
+        </div>
+      </div>
+    </section>
+
+    <!-- イベント -->
+    <section id="events" class="events">
+      <div class="container">
+        <h2 class="section-title"><span class="en">Events</span>イベント</h2>
+        <ul class="event-list">
+          <li class="event-card">
+            <p class="event-date"><span class="m">11</span><span class="d">23</span><span class="w">月・祝</span></p>
+            <div><h3>あおぞら秋まつり</h3><p>中央公園で、地元の野菜やお菓子のお店が並びます。</p></div>
+          </li>
+          <li class="event-card">
+            <p class="event-date"><span class="m">12</span><span class="d">7</span><span class="w">日</span></p>
+            <div><h3>親子防災ワークショップ</h3><p>非常食づくりや、避難所での過ごし方を体験します。</p></div>
+          </li>
+          <li class="event-card">
+            <p class="event-date"><span class="m">12</span><span class="d">14</span><span class="w">日</span></p>
+            <div><h3>冬の星空観察会</h3><p>空に近いまちならではの、満天の星を観察します。</p></div>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 市長の部屋 -->
+    <section id="mayor" class="mayor">
+      <div class="container">
+        <h2 class="section-title"><span class="en">Mayor's Office</span>市長の部屋</h2>
+        <div class="mayor-grid">
+          <div class="mayor-card">
+            <div class="mayor-mark" aria-hidden="true">牟田</div>
+            <p class="mayor-role">あおぞら市長</p>
+            <p class="mayor-name">牟田 聖</p>
+            <p class="mayor-message">「空に近いまちだからこそ、遠くまで見わたせる市政を。」<br>市民のみなさんの声に耳をかたむけ、子どもからお年寄りまで、だれもが安心してくらせるまちをつくります。</p>
+          </div>
+          <div class="mayor-side">
+            <h3 class="sub-title">市長の動き</h3>
+            <ul class="schedule">
+              <li><time>11月14日</time>あおぞら小学校 創立50周年記念式典に出席</li>
+              <li><time>11月12日</time>子育て世代との意見交換会</li>
+              <li><time>11月8日</time>総合防災訓練の打ち合わせ</li>
+            </ul>
+            <div class="secretary">
+              <p class="secretary-role">市長公室 秘書課</p>
+              <p class="secretary-name">秘書　野中 浩輝</p>
+              <p class="small">市長への取材・講演のご依頼は、秘書課までご連絡ください。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 市役所案内 -->
+    <section id="office" class="office">
+      <div class="container office-grid">
+        <div>
+          <h2 class="section-title"><span class="en">City Hall</span>市役所案内</h2>
+          <dl class="office-info">
+            <dt>開庁時間</dt><dd>月曜日〜金曜日　8:45〜17:30<br>（土日・祝日・年末年始を除く）</dd>
+            <dt>休日窓口</dt><dd>毎月第2・第4土曜日　9:00〜12:00（市民課のみ）</dd>
+            <dt>住所</dt><dd>〒000-0000 あおぞら市中央1丁目1番1号（架空）</dd>
+            <dt>代表電話</dt><dd>0000-00-0000（架空）</dd>
+          </dl>
+        </div>
+        <ul class="office-links">
+          <li><a href="#" data-demo>窓口のご案内（どこで何ができるか）</a></li>
+          <li><a href="#" data-demo>各課の電話番号</a></li>
+          <li><a href="#" data-demo>オンラインでできる手続き</a></li>
+          <li><a href="#" data-demo>市役所へのアクセス・駐車場</a></li>
+        </ul>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p class="footer-logo">あおぞら市役所</p>
+      <p class="small">〒000-0000 あおぞら市中央1丁目1番1号（架空）</p>
+      <p class="small">※当サイトはポートフォリオ用の見本サイトです。あおぞら市は架空の市で、実在の自治体とは関係ありません。</p>
+      <p class="small">&copy; Aozora City</p>
+    </div>
+  </footer>
+
+  <!-- 上に戻るボタン -->
+  <a href="#top" class="to-top" aria-label="ページの先頭へ戻る">↑</a>
+
+  <!-- 見本サイト用のお知らせ -->
+  <div class="toast" role="status" aria-live="polite"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
