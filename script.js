@@ -363,3 +363,90 @@ document.querySelector('[data-demo-form]').addEventListener('submit', (e) => {
   e.preventDefault();
   showToast();
 });
+
+// --- お知らせ：Google スプレッドシートから読み込む ---
+// ▼ スプレッドシートを「ウェブに公開」したときの CSV のアドレスを、'' の中に貼ります。
+//   空のままなら、HTML に書いてある見本のお知らせがそのまま出ます。
+//   表の形：1行目は見出し（日付・ラベル・お知らせ）、2行目から上に新しいものを書く
+const NEWS_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRCJ99g4DxrZCU9Rx0_8twRX28DuOjELGq_rT8gel73toSpZhRA4YOhKZU22aOTtJEpyS37MrGNCc80/pub?gid=0&single=true&output=csv';
+const NEWS_MAX = 8; // 表示するお知らせの数（上から順に）
+
+// CSV（カンマ区切りの文字）を、表の形（行と列）に直す
+function parseCSV(text) {
+  const rows = [];
+  let row = [];
+  let cell = '';
+  let quoted = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (quoted) {
+      if (c === '"' && text[i + 1] === '"') { cell += '"'; i++; }
+      else if (c === '"') quoted = false;
+      else cell += c;
+    } else if (c === '"') quoted = true;
+    else if (c === ',') { row.push(cell); cell = ''; }
+    else if (c === '\n') { row.push(cell); rows.push(row); row = []; cell = ''; }
+    else if (c !== '\r') cell += c;
+  }
+  if (cell !== '' || row.length) { row.push(cell); rows.push(row); }
+  return rows;
+}
+
+// 表を読んで [{ date, tag, text }, ...] にする。読めないときは null（見本のお知らせのまま）
+async function fetchNews() {
+  if (!NEWS_SHEET_URL) return null;
+  try {
+    const res = await fetch(NEWS_SHEET_URL, { cache: 'no-store' });
+    if (!res.ok) throw new Error(res.status);
+    const items = parseCSV(await res.text())
+      .slice(1)
+      .map((r) => ({ date: (r[0] || '').trim(), tag: (r[1] || '').trim(), text: (r[2] || '').trim() }))
+      .filter((n) => n.text)
+      .slice(0, NEWS_MAX);
+    return items.length ? items : null;
+  } catch (err) {
+    console.warn('お知らせを読み込めませんでした', err);
+    return null;
+  }
+}
+
+// 「2026.11.10」「2026/11/10」「2026年11月10日」を、機械が読める日付（2026-11-10）にする
+function toISODate(s) {
+  const m = s.match(/(\d{4})\D+(\d{1,2})\D+(\d{1,2})/);
+  return m ? `${m[1]}-${m[2].padStart(2, '0')}-${m[3].padStart(2, '0')}` : '';
+}
+
+// 文字は textContent で入れる（表に何を書かれても、安全に文字として出す）
+function el(tag, className, text) {
+  const e = document.createElement(tag);
+  if (className) e.className = className;
+  if (text != null) e.textContent = text;
+  return e;
+}
+
+// ラベルの列に「くらし」「子育て」「防災」のどれかを書くと、そのタブに入る
+const NEWS_CATS = { 'くらし': 'kurashi', '子育て': 'kosodate', '防災': 'bousai' };
+
+async function loadNews() {
+  const list = document.getElementById('news-list');
+  const items = await fetchNews();
+  if (!list || !items) return;
+  list.replaceChildren(...items.map((n) => {
+    const cat = NEWS_CATS[n.tag] || '';
+    const li = el('li');
+    if (cat) li.dataset.cat = cat;
+    const time = el('time', '', n.date);
+    const iso = toISODate(n.date);
+    if (iso) time.dateTime = iso;
+    const link = el('a', '', n.text);
+    link.href = '#';
+    link.addEventListener('click', (e) => { e.preventDefault(); showToast(); });
+    li.append(time, el('span', `cat ${cat}`.trim(), n.tag), link);
+    return li;
+  }));
+  // 今選ばれているタブに合わせて、表示をしぼり直す
+  const active = document.querySelector('.tabs button[aria-selected="true"]');
+  if (active) active.click();
+}
+
+loadNews();
