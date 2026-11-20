@@ -190,6 +190,16 @@ function go(dir) {
 document.documentElement.classList.add('cinema-on');
 render();
 
+// 演出は、この端末で初めて開いたときだけ。2回目からは便利なページから始める
+// （ページの一番上で、さらに上へ戻すと演出も見られます）
+if (load('aozora-intro-seen')) {
+  cinema.style.transition = 'none';
+  exitCinema();
+  requestAnimationFrame(() => requestAnimationFrame(() => { cinema.style.transition = ''; }));
+} else {
+  save('aozora-intro-seen', '1');
+}
+
 // マウスのホイール・トラックパッド
 window.addEventListener('wheel', (e) => {
   if (Math.abs(e.deltaY) < 4) return;

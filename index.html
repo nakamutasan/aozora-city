@@ -5,6 +5,61 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>あおぞら市公式ホームページ</title>
   <meta name="description" content="あおぞら市（ポートフォリオ用の架空の市です）の公式ホームページ。くらし・子育て・防災・観光などの情報をお届けします。">
+  <!-- 見本サイトなので、Google などの検索結果には出さない（URL を知っている人は見られます） -->
+  <meta name="robots" content="noindex">
+
+  <!-- 検索エンジン向け：このアドレスが正式なページです -->
+  <link rel="canonical" href="https://aozora-city.vercel.app/">
+
+  <!-- サイトのアイコン（ブラウザのタブ・スマホのホーム画面に出る） -->
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <meta name="theme-color" content="#1f6fb5">
+
+  <!-- SNS用の情報：LINE や Instagram でアドレスを送ると、写真つきのカードで表示される -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="あおぞら市">
+  <meta property="og:title" content="あおぞら市公式ホームページ">
+  <meta property="og:description" content="あおぞら市（ポートフォリオ用の架空の市です）の公式ホームページ。くらし・子育て・防災・観光などの情報をお届けします。">
+  <meta property="og:url" content="https://aozora-city.vercel.app/">
+  <meta property="og:image" content="https://aozora-city.vercel.app/images/ogp.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:locale" content="ja_JP">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <!-- 構造化データ：お店などの情報を Google が読み取りやすい形で書いたもの（住所・電話は架空です） -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "GovernmentOffice",
+    "name": "あおぞら市役所",
+    "description": "あおぞら市の公式ホームページ（ポートフォリオ用の架空の市です）。",
+    "telephone": "0000-00-0000",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "あおぞら市",
+      "streetAddress": "中央1丁目1番1号",
+      "addressCountry": "JP"
+    },
+    "openingHoursSpecification": [
+      {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": [
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday"
+        ],
+        "opens": "08:45",
+        "closes": "17:30"
+      }
+    ],
+    "url": "https://aozora-city.vercel.app/",
+    "image": "https://aozora-city.vercel.app/images/ogp.jpg"
+  }
+  </script>
   <!-- 文字のデザイン（Google Fonts） -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -327,6 +382,6 @@
   <!-- 見本サイト用のお知らせ -->
   <div class="toast" role="status" aria-live="polite"></div>
 
-  <script src="script.js"></script>
+  <script src="script.js?v=2"></script>
 </body>
 </html>
